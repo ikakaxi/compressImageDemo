@@ -6,7 +6,6 @@
 # create date：2020-09-24 on 1:20 PM
 import os
 
-
 # 查找指定文件夹里大于指定kb的图片列表
 def findBigImageFile(folder, size):
     bigFiles = []
@@ -23,18 +22,8 @@ def findBigImageFile(folder, size):
                     bigFiles.append(file)
     return bigFiles
 
-
-# 将modules中的文件夹都添加到集合里并返回
-def saveBigImageFile(modules):
-    folders = []
-    for module in modules:
-        folders.append(module)
-    return folders
-
-
 # modules为当前同级目录下的图片文件夹列表
-modules = ["assets/images"]
-folders = saveBigImageFile(modules)
+folders = ["assets/images",]
 
 # 将大于指定kb的文件都存到bigFiles里
 bigFiles = []
@@ -50,16 +39,21 @@ for bigFile in bigFiles:
     absFileName = os.path.splitext(bigFile)[0]
     before = os.path.getsize(bigFile) / 1024
     beforeCompressSize += before
-    print("压缩前", before, "kb")
-    cmd = "cwebp -q 75 " + bigFile + " -o " + absFileName + ".webp"
-    print(cmd)
-    os.system(cmd)
-    after = os.path.getsize(absFileName + ".webp") / 1024
-    afterCompressSize += after
-    print("压缩后", after)
+    print "压缩前", before, "kb"
+    try:
+        cmd = "cwebp -quiet 75 " + bigFile + " -o " + absFileName + ".webp"
+        print cmd
+        os.system(cmd)
+    except BaseException as err:
+        print err
+    else:
+        after = os.path.getsize(absFileName + ".webp") / 1024
+        afterCompressSize += after
+        print "压缩后", after, "kb", "压缩比", after * 100 / before, "%"
+        print ""
 for bigFile in bigFiles:
     # 转为webp后删除原文件
     os.remove(bigFile)
 
 if beforeCompressSize > 0:
-    print("压缩比", afterCompressSize / beforeCompressSize * 100, "%")
+    print "总压缩比", afterCompressSize * 100 / beforeCompressSize, "%"
